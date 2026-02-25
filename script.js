@@ -25,7 +25,6 @@ const CONTENT = {
   projects: {
     filters: ["All", "Web", "UI", "Other"],
     items: [
-      // 1) FIRST IN CAROUSEL
       {
         id: "home-pamos",
         title: "PAM OS Homepage",
@@ -33,11 +32,9 @@ const CONTENT = {
         description: "A personal project.",
         tech: ["Notion"],
         links: { live: "https://example.com", github: "https://github.com/" },
-        thumbnail: "assets/home-pamos.png", // <-- put file in /assets
+        thumbnail: "assets/home-pamos.png",
         details: ["Add more details here."],
       },
-
-      // 2) SECOND IN CAROUSEL
       {
         id: "kintal-pamos",
         title: "PAM OS Kintal",
@@ -45,11 +42,9 @@ const CONTENT = {
         description: "A personal project.",
         tech: ["Notion"],
         links: { live: "https://example.com", github: "https://github.com/" },
-        thumbnail: "assets/kintal-pamos.png", // <-- put file in /assets
+        thumbnail: "assets/kintal-pamos.png",
         details: ["Add more details here."],
       },
-
-      // Your existing project (now third)
       {
         id: "project-1",
         title: "Project One",
@@ -106,6 +101,79 @@ function escapeHtml(str) {
 
 function prefersReducedMotion() {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+/* -----------------------------
+   WORK LOGOS MARQUEE
+-------------------------------- */
+const WORK_LOGOS = [
+  { name: "Sutherland", file: "assets/work-logos/1 Sutherland.png" },
+  { name: "FTD", file: "assets/work-logos/2 FTD.png" },
+  { name: "Startek", file: "assets/work-logos/3 Startek.png" },
+  { name: "Credit One", file: "assets/work-logos/4 Credit One.png" },
+  { name: "CloudHQ", file: "assets/work-logos/5 CloudHQ.png" },
+  { name: "iQor", file: "assets/work-logos/6 iQor.png" },
+  { name: "T-Mobile", file: "assets/work-logos/7 T-Mobile.png" },
+  { name: "Athena", file: "assets/work-logos/8 Athena.png" },
+  { name: "TGC", file: "assets/work-logos/9 TGC.png" },
+  { name: "Tenant CS", file: "assets/work-logos/10 Tenant CS.png" },
+];
+
+function initWorkMarquee() {
+  const track = $("#workMarqueeTrack");
+  if (!track) return;
+
+  const oneSet = WORK_LOGOS.map(
+    (l) => `
+      <div class="marquee-item" aria-label="${escapeHtml(l.name)}">
+        <img
+          src="${escapeHtml(l.file)}"
+          alt="${escapeHtml(l.name)} logo"
+          loading="eager"
+          decoding="async"
+        />
+      </div>
+    `
+  ).join("");
+
+  // Duplicate for seamless scroll
+  track.innerHTML = oneSet + oneSet;
+
+  const imgs = $$("img", track);
+
+  function setDistance() {
+    // Because we duplicated: one set width = total scrollWidth / 2
+    const distance = track.scrollWidth / 2;
+    track.style.setProperty("--marquee-distance", `${distance}px`);
+  }
+
+  // Wait for images to load before measuring (prevents stutter seam)
+  let remaining = imgs.length;
+  if (!remaining) {
+    setDistance();
+    return;
+  }
+
+  function doneOne() {
+    remaining -= 1;
+    if (remaining === 0) setDistance();
+  }
+
+  imgs.forEach((img) => {
+    if (img.complete) {
+      doneOne();
+      return;
+    }
+    img.addEventListener("load", doneOne, { once: true });
+    img.addEventListener("error", doneOne, { once: true });
+  });
+
+  // Re-measure on resize (responsive)
+  window.addEventListener("resize", setDistance, { passive: true });
+
+  if (prefersReducedMotion()) {
+    track.style.animation = "none";
+  }
 }
 
 /* Renderers */
@@ -310,9 +378,7 @@ function initHeroCarousel() {
   dotsWrap.innerHTML = items
     .map(
       (_, i) =>
-        `<button class="dot" type="button" aria-label="Go to slide ${i + 1}" aria-current="${
-          i === 0 ? "true" : "false"
-        }" data-dot="${i}"></button>`
+        `<button class="dot" type="button" aria-label="Go to slide ${i + 1}" aria-current="${i === 0 ? "true" : "false"}" data-dot="${i}"></button>`
     )
     .join("");
 
@@ -354,10 +420,16 @@ function initHeroCarousel() {
     btn.addEventListener("click", () => goTo(Number(btn.dataset.dot || "0")));
   });
 
+  // Arrow keys only when focus is inside hero (and NOT while typing)
   document.addEventListener("keydown", (e) => {
     if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
     const active = document.activeElement;
-    const inHero = active && active.closest && active.closest(".hero");
+    if (!active) return;
+
+    const tag = (active.tagName || "").toLowerCase();
+    if (tag === "input" || tag === "textarea" || active.isContentEditable) return;
+
+    const inHero = active.closest && active.closest(".hero");
     if (!inHero) return;
 
     if (e.key === "ArrowLeft") {
@@ -375,44 +447,32 @@ function initHeroCarousel() {
 }
 
 /* -----------------------------
-   HERO LOCK (no scroll until button)
+   HERO LOCK (no page scroll until button)
 -------------------------------- */
 function initHeroLock() {
-  const hero = document.querySelector(".hero");
+  const htmlEl = document.documentElement;
+  const heroInner = document.querySelector(".hero .hero-inner");
   const unlockBtn = document.querySelector('.scroll-down-btn[href^="#"]');
   const backToTopBtn = document.getElementById("backToTop");
 
-  if (!hero || !unlockBtn) return;
+  if (!heroInner || !unlockBtn) return;
 
   let locked = false;
 
   function lockHero() {
     locked = true;
-
-    // lock scroll
-    document.body.style.overflow = "hidden";
-    document.body.style.height = "100vh";
-
-    // help on iOS Safari
-    document.documentElement.style.overflow = "hidden";
-    document.documentElement.style.height = "100%";
+    htmlEl.classList.add("hero-locked");
+    document.body.style.touchAction = "auto";
   }
 
   function unlockHero() {
     locked = false;
-
-    document.body.style.overflow = "";
-    document.body.style.height = "";
-
-    document.documentElement.style.overflow = "";
-    document.documentElement.style.height = "";
+    htmlEl.classList.remove("hero-locked");
+    document.body.style.touchAction = "";
   }
 
-  function preventScroll(e) {
-    if (!locked) return;
-
-    // Allow interaction with hero controls, but block scroll gestures
-    e.preventDefault();
+  function isInsideHeroInner(target) {
+    return !!(target && target.closest && target.closest(".hero .hero-inner"));
   }
 
   function initialState() {
@@ -421,17 +481,14 @@ function initHeroLock() {
     else lockHero();
   }
 
-  // Init
   initialState();
 
-  // Keep state in sync if hash changes (back/forward)
   window.addEventListener("hashchange", () => {
     const h = (location.hash || "").toLowerCase();
     if (!h || h === "#top") lockHero();
     else unlockHero();
   });
 
-  // Unlock ONLY when clicking the hero button, then scroll
   unlockBtn.addEventListener("click", (e) => {
     const href = unlockBtn.getAttribute("href") || "";
     if (!href.startsWith("#")) return;
@@ -451,10 +508,11 @@ function initHeroLock() {
     history.pushState(null, "", `#${id}`);
   });
 
-  // Re-lock when clicking Back to top (and set hash to #top)
   if (backToTopBtn) {
     backToTopBtn.addEventListener("click", (e) => {
       e.preventDefault();
+
+      unlockHero();
 
       window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? "auto" : "smooth" });
       history.pushState(null, "", "#top");
@@ -465,15 +523,23 @@ function initHeroLock() {
     });
   }
 
-  // Hard-block scrolling while locked
-  window.addEventListener("wheel", preventScroll, { passive: false });
-  window.addEventListener("touchmove", preventScroll, { passive: false });
+  function blockPageScroll(e) {
+    if (!locked) return;
+    if (isInsideHeroInner(e.target)) return;
+    e.preventDefault();
+  }
 
-  // Block common scroll keys while locked
+  window.addEventListener("wheel", blockPageScroll, { passive: false });
+  window.addEventListener("touchmove", blockPageScroll, { passive: false });
+
   window.addEventListener("keydown", (e) => {
     if (!locked) return;
 
-    const keys = ["ArrowDown", "PageDown", "Space", "End"];
+    const active = document.activeElement;
+    const allow = active && active.closest && active.closest(".hero .hero-inner");
+    if (allow) return;
+
+    const keys = ["ArrowDown", "PageDown", "Space", "End", "PageUp", "Home"];
     if (keys.includes(e.code) || keys.includes(e.key)) {
       e.preventDefault();
     }
@@ -511,7 +577,6 @@ function initSmoothScroll() {
     const a = e.target.closest('a[href^="#"]');
     if (!a) return;
 
-    // IMPORTANT: hero button is handled by initHeroLock (so it can unlock first)
     if (a.classList.contains("scroll-down-btn")) return;
 
     const hash = a.getAttribute("href");
@@ -734,10 +799,7 @@ function initContactForm() {
 
 /* Back to top */
 function initBackToTop() {
-  // NOTE: Back-to-top locking is handled in initHeroLock()
   $("#backToTop")?.addEventListener("click", (e) => {
-    // If initHeroLock is active, we prevent default there already.
-    // Keep this as a fallback for safety.
     if (e.defaultPrevented) return;
     window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? "auto" : "smooth" });
   });
@@ -754,8 +816,11 @@ function init() {
 
   initHeroLinks();
   initHeroCarousel();
-  initHeroLock(); // ✅ ADD: lock hero until button is clicked
 
+  // ✅ Work logos marquee (fixed)
+  initWorkMarquee();
+
+  initHeroLock();
   initSmoothScroll();
   initRevealOnScroll();
   initProjectFiltering();

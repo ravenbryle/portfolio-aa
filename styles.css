@@ -28,18 +28,31 @@
   --radius-lg: 18px;
   --shadow-1: 0 10px 30px rgba(39, 37, 37, 0.10);
 
+  /* ✅ KEEP mobile margin the same (24px on each side) */
   --space-5: 24px;
   --space-6: 32px;
   --space-8: 60px;
 
   --font-sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
 
-  --container: 1120px;
+  /* ✅ FULL/WIDER BODY: increase max container width */
+  --container: 1440px;
 
   --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
   --dur-1: 160ms;
   --dur-2: 260ms;
   --dur-3: 420ms;
+
+  /* ✅ marquee sizing + speed (BIGGER logos, consistent across breakpoints) */
+  --marquee-gap: 34px;
+  --marquee-logo: 120px; /* ✅ base size (mobile) */
+  --marquee-speed: 26s;
+
+  /* ✅ NEW: tighter gap between marquee and the next section */
+  --marquee-after-gap: 12px; /* adjust this number to taste */
+
+  /* ✅ NEW: JS will set this so the loop is pixel-perfect */
+  --marquee-distance: 0px;
 }
 
 /* -----------------------------
@@ -142,7 +155,7 @@ a:hover {
 .hero {
   width: 100%;
 
-  /* ✅ lock hero to viewport height so it doesn't grow taller */
+  /* lock hero to viewport height so it doesn't grow taller */
   height: 100svh;
   min-height: 100svh;
 
@@ -308,6 +321,7 @@ a:hover {
   padding: 16px;
 }
 
+/* keep header single-line height + align controls nicely */
 .glass-header {
   display: flex;
   align-items: center;
@@ -320,6 +334,7 @@ a:hover {
 .glass-title {
   margin: 0;
   font-size: 1.05rem;
+  line-height: 1.15;
   letter-spacing: -0.02em;
   color: var(--hero-text);
 }
@@ -329,10 +344,11 @@ a:hover {
   gap: 10px;
 }
 
+/* carousel buttons wider + shorter (match title height) */
 .glass-btn {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
+  width: 56px;
+  height: 32px;
+  border-radius: 10px;
 
   border: 1px solid rgba(235, 235, 235, 0.18);
   background: rgba(255, 255, 255, 0.06);
@@ -340,6 +356,13 @@ a:hover {
 
   cursor: pointer;
   transition: transform var(--dur-1) var(--ease), background var(--dur-2) var(--ease);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  line-height: 1;
+  font-size: 18px;
 }
 .glass-btn:hover {
   background: rgba(255, 255, 255, 0.1);
@@ -368,12 +391,14 @@ a:hover {
   border: 1px solid rgba(235, 235, 235, 0.14);
   background: rgba(0, 0, 0, 0.12);
   overflow: hidden;
+  display: grid;
 }
 
-/* Locked image area: container NEVER changes with photo size */
+/* image area adapts to width (no fixed height) */
 .slide-media {
   aspect-ratio: 16 / 9;
-  height: 220px;
+  width: 100%;
+  height: auto;
   min-height: 0;
   overflow: hidden;
   background: linear-gradient(135deg, rgba(139, 11, 175, 0.22), rgba(214, 98, 248, 0.16));
@@ -384,6 +409,7 @@ a:hover {
   height: 100%;
   object-fit: cover;
   object-position: center;
+  display: block;
 }
 
 .slide-body {
@@ -435,27 +461,6 @@ a:hover {
   background: rgba(255, 255, 255, 0.45);
 }
 
-/* Short description below carousel */
-.glass-desc {
-  margin-top: 14px;
-  padding-top: 14px;
-  border-top: 1px solid rgba(235, 235, 235, 0.14);
-  text-align: left;
-}
-
-.glass-desc-title {
-  margin: 0 0 6px;
-  color: rgba(235, 235, 235, 0.92);
-  font-weight: 700;
-  letter-spacing: -0.01em;
-}
-
-.glass-desc-body {
-  margin: 0;
-  color: var(--hero-muted);
-  line-height: 1.5;
-}
-
 /* green dot glow pulse */
 @keyframes statusGlow {
   0% {
@@ -475,12 +480,11 @@ a:hover {
   }
 }
 
-/* ✅ UPDATED: Button is no longer "super wide" */
+/* Button uses #ffc14a gradient (to a darker tone) */
 .scroll-down-btn {
   grid-area: button;
   justify-self: center;
 
-  /* stick to bottom of the hero-inner scroll container */
   position: sticky;
   bottom: calc(14px + env(safe-area-inset-bottom));
   z-index: 2;
@@ -495,35 +499,53 @@ a:hover {
 
   height: 54px;
 
-  /* ✅ CHANGED sizing */
   width: auto;
-  max-width: calc(100% - 24px); /* respects hero-inner padding */
-  min-width: 210px;            /* still feels like a CTA */
-  padding: 0 16px;             /* slimmer */
+  max-width: calc(100% - 24px);
+  min-width: 210px;
+  padding: 0 16px;
 
   border-radius: 999px;
   text-decoration: none;
 
-  color: var(--hero-text);
-  border: 1px solid rgba(235, 235, 235, 0.18);
-  background: rgba(235, 235, 235, 0.06);
+  color: #272525;
+  border: 1px solid color-mix(in srgb, var(--cta) 58%, rgba(235, 235, 235, 0.18));
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--cta) 92%, white),
+    color-mix(in srgb, var(--cta) 72%, #9a6a00)
+  );
+
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.28),
+    0 0 0 0 rgba(255, 193, 74, 0);
 
   animation: pulseBob 1.9s var(--ease) infinite;
   will-change: transform, box-shadow;
 }
+
 .scroll-down-btn:hover {
-  background: rgba(235, 235, 235, 0.1);
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--cta) 96%, white),
+    color-mix(in srgb, var(--cta) 78%, #7a5200)
+  );
+}
+
+.scroll-down-btn:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--cta) 70%, white);
+  outline-offset: 4px;
+  border-radius: 999px;
 }
 
 .scroll-down-label {
-  font-weight: 700;
+  font-weight: 800;
   letter-spacing: -0.01em;
-  color: var(--hero-text);
+  color: inherit;
 }
 .scroll-down-icon {
   font-size: 1.15rem;
   line-height: 1;
-  color: var(--hero-text);
+  color: inherit;
 }
 
 /* Synced bob + glow */
@@ -531,20 +553,20 @@ a:hover {
   0% {
     transform: translateY(0);
     box-shadow:
-      0 0 0 0 rgba(214, 98, 248, 0),
-      0 0 0 0 rgba(139, 11, 175, 0);
+      0 10px 30px rgba(0, 0, 0, 0.28),
+      0 0 0 0 rgba(255, 193, 74, 0);
   }
   45% {
     transform: translateY(6px);
     box-shadow:
-      0 0 18px 6px rgba(214, 98, 248, 0.22),
-      0 0 34px 12px rgba(139, 11, 175, 0.18);
+      0 14px 38px rgba(0, 0, 0, 0.32),
+      0 0 26px 10px rgba(255, 193, 74, 0.22);
   }
   100% {
     transform: translateY(0);
     box-shadow:
-      0 0 0 0 rgba(214, 98, 248, 0),
-      0 0 0 0 rgba(139, 11, 175, 0);
+      0 10px 30px rgba(0, 0, 0, 0.28),
+      0 0 0 0 rgba(255, 193, 74, 0);
   }
 }
 
@@ -565,14 +587,13 @@ a:hover {
 
   .glass-card {
     padding: 22px;
-    min-height: 540px;
+    min-height: auto;
   }
 
   .slide-media {
-    height: 380px;
+    max-height: 380px;
   }
 
-  /* ✅ CHANGED: capped desktop width */
   .scroll-down-btn {
     min-width: 240px;
     max-width: 320px;
@@ -586,7 +607,7 @@ a:hover {
 .body-shell {
   width: 100%;
   background: var(--body-bg);
-  border-radius: 28px;
+  border-radius: clamp(22px, 4vw, 28px);
   border-top: 1px solid rgba(39, 37, 37, 0.1);
   box-shadow:
     0 -20px 60px rgba(0, 0, 0, 0.22),
@@ -596,14 +617,95 @@ a:hover {
   margin-bottom: 24px;
 }
 
-/* Sections */
+/* ✅ Work marquee section (first thing in body) — floating logos, NO title, NO borders/cases */
+.work-marquee {
+  background: var(--body-bg);
+  padding: clamp(18px, 2.8vw, 28px) 0;
+  border-bottom: 0;
+
+  /* ✅ EDIT: reduce only the space AFTER the marquee */
+  padding-bottom: var(--marquee-after-gap);
+  margin-bottom: 0;
+}
+
+/* ✅ EDIT: reduce top padding of the very next section only */
+.work-marquee + .section {
+  padding-top: var(--marquee-after-gap);
+}
+
+/* marquee viewport — transparent, no border/case */
+.marquee {
+  position: relative;
+  overflow: hidden;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+
+  /* soft fade edges */
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
+}
+
+/* track that scrolls */
+.marquee-track {
+  display: flex;
+  align-items: center;
+  gap: var(--marquee-gap);
+  padding: 14px 0;
+
+  width: max-content;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+
+  /* ✅ FIX: animate by measured pixel distance (set by JS) */
+  animation: marqueeScrollPx var(--marquee-speed) linear infinite;
+}
+
+@media (hover: hover) {
+  .marquee:hover .marquee-track {
+    animation-play-state: paused;
+  }
+}
+
+/* NO logo “cases” */
+.marquee-item {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* Bigger, floating logos */
+.marquee-item img {
+  height: var(--marquee-logo);
+  width: auto;
+  display: block;
+  object-fit: contain;
+
+  filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.12));
+  opacity: 0.98;
+}
+
+/* ✅ FIX: pixel-perfect marquee loop */
+@keyframes marqueeScrollPx {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(calc(-1 * var(--marquee-distance)), 0, 0); }
+}
+
 .section {
-  padding: var(--space-8) 0;
+  padding: clamp(44px, 6vw, 84px) 0;
+  scroll-margin-top: 18px;
 }
 
 /* Section headers */
 .section-header {
-  margin-bottom: 32px;
+  margin-bottom: clamp(22px, 3vw, 32px);
 }
 
 .section-title {
@@ -616,7 +718,7 @@ a:hover {
 .section-subtitle {
   margin: 0;
   color: var(--muted);
-  max-width: 70ch;
+  max-width: 62ch;
 }
 
 /* Cards */
@@ -625,7 +727,7 @@ a:hover {
   border: 1px solid rgba(39, 37, 37, 0.12);
   border-radius: 18px;
   box-shadow: var(--shadow-1);
-  padding: 24px;
+  padding: clamp(18px, 3.2vw, 24px);
 }
 
 .card-title {
@@ -645,7 +747,7 @@ a:hover {
 /* About */
 .about-grid {
   display: grid;
-  gap: 24px;
+  gap: 18px;
 }
 
 .facts {
@@ -673,7 +775,7 @@ a:hover {
 /* Skills */
 .skills-grid {
   display: grid;
-  gap: 24px;
+  gap: 18px;
 }
 .skill-chips {
   display: flex;
@@ -743,6 +845,7 @@ a:hover {
   background: transparent;
 }
 
+/* Projects */
 .projects-toolbar {
   display: flex;
   flex-direction: column;
@@ -783,7 +886,7 @@ a:hover {
 
 .projects-grid {
   display: grid;
-  gap: 24px;
+  gap: 18px;
   grid-template-columns: 1fr;
 }
 .project-card {
@@ -793,6 +896,12 @@ a:hover {
 .project-media {
   aspect-ratio: 16 / 9;
   border-bottom: 1px solid rgba(39, 37, 37, 0.12);
+}
+.project-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 .project-content {
   padding: 24px;
@@ -865,7 +974,7 @@ a:hover {
 /* Testimonials */
 .testimonials-grid {
   display: grid;
-  gap: 24px;
+  gap: 18px;
   grid-template-columns: 1fr;
 }
 .quote {
@@ -880,7 +989,7 @@ a:hover {
 /* Contact */
 .contact-grid {
   display: grid;
-  gap: 24px;
+  gap: 18px;
 }
 .form {
   display: grid;
@@ -1036,20 +1145,40 @@ a:hover {
 
 /* Breakpoints */
 @media (min-width: 480px) {
+  :root {
+    --marquee-logo: 140px;
+    --marquee-gap: 38px;
+  }
+
   .testimonials-grid {
     grid-template-columns: 1fr 1fr;
+    gap: 22px;
   }
+
+  .about-grid,
+  .skills-grid,
+  .contact-grid,
+  .projects-grid {
+    gap: 22px;
+  }
+
   .projects-toolbar {
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
+    gap: 16px;
   }
+
   .toolbar-right {
     width: min(320px, 42vw);
   }
 }
 
 @media (min-width: 768px) {
+  :root {
+    --marquee-logo: 160px;
+  }
+
   .about-grid {
     grid-template-columns: 1.2fr 0.8fr;
   }
@@ -1065,6 +1194,10 @@ a:hover {
 }
 
 @media (min-width: 1024px) {
+  :root {
+    --marquee-logo: 180px;
+  }
+
   .projects-grid {
     grid-template-columns: repeat(3, 1fr);
   }
@@ -1089,6 +1222,12 @@ a:hover {
   }
   .carousel-track {
     transition: none !important;
+  }
+
+  /* marquee: stop motion for reduced motion users */
+  .marquee-track {
+    animation: none !important;
+    transform: none !important;
   }
 }
 

@@ -66,7 +66,7 @@
           <aside class="hero-right" aria-label="Featured projects carousel">
             <div class="glass-card">
               <div class="glass-header">
-                <h2 class="glass-title">Featured projects</h2>
+                <h2 class="glass-title">Featured Projects</h2>
 
                 <div class="glass-controls" aria-label="Carousel controls">
                   <button class="glass-btn" type="button" id="carouselPrev" aria-label="Previous project">‹</button>
@@ -97,19 +97,11 @@
               <div class="carousel-dots" id="carouselDots" aria-label="Carousel pagination">
                 <!-- populated by JS -->
               </div>
-
-              <!-- NEW: short description below -->
-              <div class="glass-desc" aria-label="Featured projects note">
-                <p class="glass-desc-title">What you’re seeing</p>
-                <p class="glass-desc-body">
-                  A quick peek at a few projects I’m proud of—clean UI, thoughtful motion, and accessible details.
-                </p>
-              </div>
             </div>
           </aside>
 
           <!-- Scroll down button -->
-          <a class="scroll-down-btn" href="#about" aria-label="Scroll down to About section">
+          <a class="scroll-down-btn" href="#work" aria-label="Scroll down to Work section">
             <span class="scroll-down-label">More down here!</span>
             <span class="scroll-down-icon" aria-hidden="true">↯</span>
           </a>
@@ -118,6 +110,18 @@
 
       <!-- BODY SHELL -->
       <div class="body-shell" id="contentShell">
+        <!-- ✅ NEW: WORK MARQUEE (first section in body) -->
+        <section class="work-marquee" id="work" aria-label="Companies I've worked with">
+          <div class="container">
+
+            <div class="marquee" role="region" aria-label="Company logos marquee">
+              <div class="marquee-track" id="workMarqueeTrack">
+                <!-- populated by JS -->
+              </div>
+            </div>
+          </div>
+        </section>
+
         <!-- ABOUT -->
         <section class="section" id="about" data-section>
           <div class="container">
