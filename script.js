@@ -310,7 +310,9 @@ function initHeroCarousel() {
   dotsWrap.innerHTML = items
     .map(
       (_, i) =>
-        `<button class="dot" type="button" aria-label="Go to slide ${i + 1}" aria-current="${i === 0 ? "true" : "false"}" data-dot="${i}"></button>`
+        `<button class="dot" type="button" aria-label="Go to slide ${i + 1}" aria-current="${
+          i === 0 ? "true" : "false"
+        }" data-dot="${i}"></button>`
     )
     .join("");
 
@@ -372,6 +374,112 @@ function initHeroCarousel() {
   update();
 }
 
+/* -----------------------------
+   HERO LOCK (no scroll until button)
+-------------------------------- */
+function initHeroLock() {
+  const hero = document.querySelector(".hero");
+  const unlockBtn = document.querySelector('.scroll-down-btn[href^="#"]');
+  const backToTopBtn = document.getElementById("backToTop");
+
+  if (!hero || !unlockBtn) return;
+
+  let locked = false;
+
+  function lockHero() {
+    locked = true;
+
+    // lock scroll
+    document.body.style.overflow = "hidden";
+    document.body.style.height = "100vh";
+
+    // help on iOS Safari
+    document.documentElement.style.overflow = "hidden";
+    document.documentElement.style.height = "100%";
+  }
+
+  function unlockHero() {
+    locked = false;
+
+    document.body.style.overflow = "";
+    document.body.style.height = "";
+
+    document.documentElement.style.overflow = "";
+    document.documentElement.style.height = "";
+  }
+
+  function preventScroll(e) {
+    if (!locked) return;
+
+    // Allow interaction with hero controls, but block scroll gestures
+    e.preventDefault();
+  }
+
+  function initialState() {
+    const h = (location.hash || "").toLowerCase();
+    if (h && h !== "#top") unlockHero();
+    else lockHero();
+  }
+
+  // Init
+  initialState();
+
+  // Keep state in sync if hash changes (back/forward)
+  window.addEventListener("hashchange", () => {
+    const h = (location.hash || "").toLowerCase();
+    if (!h || h === "#top") lockHero();
+    else unlockHero();
+  });
+
+  // Unlock ONLY when clicking the hero button, then scroll
+  unlockBtn.addEventListener("click", (e) => {
+    const href = unlockBtn.getAttribute("href") || "";
+    if (!href.startsWith("#")) return;
+
+    const id = href.slice(1);
+    const target = document.getElementById(id);
+    if (!target) return;
+
+    e.preventDefault();
+    unlockHero();
+
+    target.scrollIntoView({
+      behavior: prefersReducedMotion() ? "auto" : "smooth",
+      block: "start",
+    });
+
+    history.pushState(null, "", `#${id}`);
+  });
+
+  // Re-lock when clicking Back to top (and set hash to #top)
+  if (backToTopBtn) {
+    backToTopBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+
+      window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? "auto" : "smooth" });
+      history.pushState(null, "", "#top");
+
+      window.setTimeout(() => {
+        lockHero();
+      }, prefersReducedMotion() ? 0 : 350);
+    });
+  }
+
+  // Hard-block scrolling while locked
+  window.addEventListener("wheel", preventScroll, { passive: false });
+  window.addEventListener("touchmove", preventScroll, { passive: false });
+
+  // Block common scroll keys while locked
+  window.addEventListener("keydown", (e) => {
+    if (!locked) return;
+
+    const keys = ["ArrowDown", "PageDown", "Space", "End"];
+    if (keys.includes(e.code) || keys.includes(e.key)) {
+      e.preventDefault();
+    }
+  });
+}
+
 /* Reveal */
 function initRevealOnScroll() {
   const els = $$(".reveal");
@@ -402,6 +510,10 @@ function initSmoothScroll() {
   document.addEventListener("click", (e) => {
     const a = e.target.closest('a[href^="#"]');
     if (!a) return;
+
+    // IMPORTANT: hero button is handled by initHeroLock (so it can unlock first)
+    if (a.classList.contains("scroll-down-btn")) return;
+
     const hash = a.getAttribute("href");
     if (!hash || hash === "#") return;
 
@@ -495,8 +607,16 @@ function openProjectModal(projectId) {
   const actions = $("#modalActions");
   if (actions) {
     actions.innerHTML = `
-      ${project.links?.live ? `<a class="btn btn-primary" href="${escapeHtml(project.links.live)}" target="_blank" rel="noreferrer">Live</a>` : ""}
-      ${project.links?.github ? `<a class="btn btn-ghost" href="${escapeHtml(project.links.github)}" target="_blank" rel="noreferrer">GitHub</a>` : ""}
+      ${
+        project.links?.live
+          ? `<a class="btn btn-primary" href="${escapeHtml(project.links.live)}" target="_blank" rel="noreferrer">Live</a>`
+          : ""
+      }
+      ${
+        project.links?.github
+          ? `<a class="btn btn-ghost" href="${escapeHtml(project.links.github)}" target="_blank" rel="noreferrer">GitHub</a>`
+          : ""
+      }
     `;
   }
 
@@ -614,7 +734,11 @@ function initContactForm() {
 
 /* Back to top */
 function initBackToTop() {
-  $("#backToTop")?.addEventListener("click", () => {
+  // NOTE: Back-to-top locking is handled in initHeroLock()
+  $("#backToTop")?.addEventListener("click", (e) => {
+    // If initHeroLock is active, we prevent default there already.
+    // Keep this as a fallback for safety.
+    if (e.defaultPrevented) return;
     window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? "auto" : "smooth" });
   });
 }
@@ -630,6 +754,7 @@ function init() {
 
   initHeroLinks();
   initHeroCarousel();
+  initHeroLock(); // ✅ ADD: lock hero until button is clicked
 
   initSmoothScroll();
   initRevealOnScroll();
