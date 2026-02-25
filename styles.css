@@ -55,6 +55,22 @@ html {
   scroll-behavior: smooth;
 }
 
+/* -----------------------------
+   HERO LOCK (toggled by JS)
+   Add/remove class "hero-locked" on <html>
+-------------------------------- */
+html.hero-locked,
+html.hero-locked body {
+  height: 100%;
+  overflow: hidden;
+}
+
+/* iOS / touch: reduce accidental scroll gestures */
+html.hero-locked body {
+  position: relative;
+  touch-action: none;
+}
+
 body {
   margin: 0;
   font-family: var(--font-sans);
@@ -125,9 +141,16 @@ a:hover {
 -------------------------------- */
 .hero {
   width: 100%;
+
+  /* ✅ lock hero to viewport height so it doesn't grow taller */
+  height: 100svh;
   min-height: 100svh;
+
   display: grid;
   place-items: center;
+
+  /* prevent the page from scrolling while hero is "locked" */
+  overflow: hidden;
 
   background:
     radial-gradient(1200px 700px at 12% 10%, color-mix(in srgb, var(--brand) 26%, transparent), transparent 55%),
@@ -135,27 +158,43 @@ a:hover {
     var(--hero-bg);
 }
 
-/* IMPORTANT: hero-inner is now a split layout */
+/* Grid layout with areas so mobile never overlaps.
+   Mobile order: left → right → button
+   Desktop: left | right, button full-width bottom
+*/
 .hero-inner {
   width: 100%;
   max-width: var(--container);
   margin-inline: auto;
-
-  /* ✅ mobile-friendly side padding (no overflow) */
   padding: clamp(18px, 4vw, 60px);
 
-  min-height: 100svh;
-  position: relative;
+  /* fill hero and allow internal scrolling */
+  height: 100%;
+  min-height: 0;
 
   display: grid;
-  grid-template-columns: 1fr; /* mobile stack */
+  grid-template-columns: 1fr;
+  grid-template-rows: auto auto auto;
+  grid-template-areas:
+    "left"
+    "right"
+    "button";
   gap: 28px;
 
-  align-content: center; /* vertically center the split */
+  align-content: start;
+
+  /* if content taller than viewport on small screens,
+     scroll INSIDE the hero to reach the button. */
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+
+  /* space so sticky button never covers content */
+  padding-bottom: calc(18px + env(safe-area-inset-bottom));
 }
 
 /* Left column */
 .hero-left {
+  grid-area: left;
   justify-self: start;
   text-align: left;
 }
@@ -179,7 +218,6 @@ a:hover {
   color: var(--hero-muted);
   justify-content: flex-start;
 
-  /* ✅ allows wrapping on small screens so it doesn't overflow */
   flex-wrap: wrap;
   row-gap: 10px;
 }
@@ -242,21 +280,15 @@ a:hover {
   height: 20px;
 }
 
-/* -----------------------------
-   ✅ RESPONSIVE FIXES FOR FEATURED PROJECTS (MOBILE-FIRST)
--------------------------------- */
-
 /* Right column glass card */
 .hero-right {
+  grid-area: right;
   width: 100%;
   max-width: 760px;
-  justify-self: end;
-
-  /* ✅ prevents layout overflow when stacked */
+  justify-self: stretch;
   min-width: 0;
 }
 
-/* ✅ make the glass card fully fluid on mobile */
 .glass-card {
   width: 100%;
   max-width: 100%;
@@ -273,11 +305,9 @@ a:hover {
     0 22px 96px rgba(0, 0, 0, 0.55),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
 
-  /* ✅ smaller padding on mobile */
   padding: 16px;
 }
 
-/* ✅ controls won't squish */
 .glass-header {
   display: flex;
   align-items: center;
@@ -321,8 +351,6 @@ a:hover {
   position: relative;
   overflow: hidden;
   border-radius: 18px;
-
-  /* ✅ ensures it can shrink inside grid/flex */
   min-width: 0;
 }
 
@@ -342,10 +370,10 @@ a:hover {
   overflow: hidden;
 }
 
-/* ✅ locked image area (mobile height) */
+/* Locked image area: container NEVER changes with photo size */
 .slide-media {
   aspect-ratio: 16 / 9;
-  height: 220px;  /* ✅ smaller on mobile */
+  height: 220px;
   min-height: 0;
   overflow: hidden;
   background: linear-gradient(135deg, rgba(139, 11, 175, 0.22), rgba(214, 98, 248, 0.16));
@@ -358,9 +386,8 @@ a:hover {
   object-position: center;
 }
 
-/* Slide body spacing */
 .slide-body {
-  padding: 14px;  /* ✅ slightly tighter on mobile */
+  padding: 14px;
   display: grid;
   gap: 8px;
 }
@@ -448,12 +475,18 @@ a:hover {
   }
 }
 
-/* Scroll down button pinned at bottom (still centered) */
+/* ✅ UPDATED: Button is no longer "super wide" */
 .scroll-down-btn {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  bottom: clamp(18px, 3.5vh, 34px);
+  grid-area: button;
+  justify-self: center;
+
+  /* stick to bottom of the hero-inner scroll container */
+  position: sticky;
+  bottom: calc(14px + env(safe-area-inset-bottom));
+  z-index: 2;
+
+  margin-top: 8px;
+  margin-bottom: 0;
 
   display: inline-flex;
   align-items: center;
@@ -461,8 +494,12 @@ a:hover {
   gap: 10px;
 
   height: 54px;
-  min-width: 220px;
-  padding: 0 18px;
+
+  /* ✅ CHANGED sizing */
+  width: auto;
+  max-width: calc(100% - 24px); /* respects hero-inner padding */
+  min-width: 210px;            /* still feels like a CTA */
+  padding: 0 16px;             /* slimmer */
 
   border-radius: 999px;
   text-decoration: none;
@@ -492,39 +529,54 @@ a:hover {
 /* Synced bob + glow */
 @keyframes pulseBob {
   0% {
-    transform: translateX(-50%) translateY(0);
+    transform: translateY(0);
     box-shadow:
       0 0 0 0 rgba(214, 98, 248, 0),
       0 0 0 0 rgba(139, 11, 175, 0);
   }
   45% {
-    transform: translateX(-50%) translateY(6px);
+    transform: translateY(6px);
     box-shadow:
       0 0 18px 6px rgba(214, 98, 248, 0.22),
       0 0 34px 12px rgba(139, 11, 175, 0.18);
   }
   100% {
-    transform: translateX(-50%) translateY(0);
+    transform: translateY(0);
     box-shadow:
       0 0 0 0 rgba(214, 98, 248, 0),
       0 0 0 0 rgba(139, 11, 175, 0);
   }
 }
 
-/* ✅ Desktop split */
+/* Desktop split */
 @media (min-width: 900px) {
   .hero-inner {
     grid-template-columns: 0.9fr 1.1fr;
+    grid-template-rows: 1fr auto;
+    grid-template-areas:
+      "left right"
+      "button button";
     align-items: center;
   }
 
+  .hero-right {
+    justify-self: end;
+  }
+
   .glass-card {
-    padding: 22px; /* restore desktop padding */
+    padding: 22px;
     min-height: 540px;
   }
 
   .slide-media {
-    height: 380px; /* locked height on desktop */
+    height: 380px;
+  }
+
+  /* ✅ CHANGED: capped desktop width */
+  .scroll-down-btn {
+    min-width: 240px;
+    max-width: 320px;
+    padding: 0 18px;
   }
 }
 
@@ -1030,7 +1082,7 @@ a:hover {
     animation: none !important;
   }
   .scroll-down-btn {
-    transform: translateX(-50%) translateY(0) !important;
+    transform: translateY(0) !important;
   }
   .status-dot {
     animation: none !important;
