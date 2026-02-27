@@ -5,10 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="color-scheme" content="light" />
-    <meta
-      name="description"
-      content="A one-page portfolio of Raven Bryle"
-    />
+    <meta name="description" content="A one-page portfolio of Raven Bryle" />
     <title>Raven Bryle</title>
 
     <link rel="stylesheet" href="styles.css" />
@@ -24,7 +21,7 @@
         <div class="hero-inner hero-split">
           <!-- LEFT -->
           <div class="hero-left">
-              <h1 class="hero-title">Hi, I'm <span class="hero-accent">Raven Bryle</span>!</h1>
+            <h1 class="hero-title">Hi, I'm <span class="hero-accent"><br />Raven Bryle</span>!</h1>
 
             <div class="hero-subrow" aria-label="Status and quick links">
               <span class="hero-status" role="status" aria-live="polite">
@@ -74,7 +71,6 @@
                 </div>
               </div>
 
-              <!-- Carousel placeholder (so it looks good even before JS runs) -->
               <div class="carousel" id="heroCarousel" aria-live="polite">
                 <div class="carousel-track">
                   <article class="carousel-slide">
@@ -94,13 +90,10 @@
                 </div>
               </div>
 
-              <div class="carousel-dots" id="carouselDots" aria-label="Carousel pagination">
-                <!-- populated by JS -->
-              </div>
+              <div class="carousel-dots" id="carouselDots" aria-label="Carousel pagination"></div>
             </div>
           </aside>
 
-          <!-- Scroll down button -->
           <a class="scroll-down-btn" href="#work" aria-label="Scroll down to Work section">
             <span class="scroll-down-label">More down here!</span>
             <span class="scroll-down-icon" aria-hidden="true">↯</span>
@@ -110,162 +103,55 @@
 
       <!-- BODY SHELL -->
       <div class="body-shell" id="contentShell">
-        <!-- ✅ NEW: WORK MARQUEE (first section in body) -->
+        <!-- WORK MARQUEE -->
         <section class="work-marquee" id="work" aria-label="Companies I've worked with">
           <div class="container">
-
             <div class="marquee" role="region" aria-label="Company logos marquee">
-              <div class="marquee-track" id="workMarqueeTrack">
-                <!-- populated by JS -->
-              </div>
+              <div class="marquee-track" id="workMarqueeTrack"></div>
             </div>
+
+            <figure class="brand-quote" aria-label="Personal quote">
+              <blockquote>
+                I think inside the box<br />Because outside the box is where everyone else is nowadays
+              </blockquote>
+            </figure>
           </div>
         </section>
 
-        <!-- ABOUT -->
-        <section class="section" id="about" data-section>
+        <!-- MY WORKS -->
+        <section class="section" id="professional-projects" aria-label="My Works">
           <div class="container">
             <header class="section-header reveal">
-              <h2 class="section-title" data-bind="about.title">Aboutkjhkjhj;ljj</h2>
-              <p class="section-subtitle" data-bind="about.subtitle">
-                A short story about what you do and how you work.
-              </p>
+              <h2 class="section-title">My Works</h2>
+              <p class="section-subtitle">Spotify-like featured player + queue. Click the big card to open details.</p>
             </header>
 
-            <div class="about-grid">
-              <div class="card reveal">
-                <h3 class="card-title" data-bind="about.cardTitle">What I care about</h3>
-                <div class="prose" id="aboutBody"></div>
-              </div>
-
-              <div class="card reveal">
-                <h3 class="card-title">Quick facts</h3>
-                <dl class="facts" id="aboutFacts"></dl>
-              </div>
-            </div>
+            <!-- ✅ PLAYLIST -->
+            <div class="mw-featured-wrap" id="myWorksPlaylist" aria-label="My Works playlist"></div>
           </div>
         </section>
 
         <!-- SKILLS -->
-        <section class="section" id="skills" data-section>
+        <section class="section" id="skills" aria-label="Skills">
           <div class="container">
             <header class="section-header reveal">
-              <h2 class="section-title" data-bind="skills.title">Skills</h2>
-              <p class="section-subtitle" data-bind="skills.subtitle">Grouped skill chips rendered from data.</p>
+              <h2 class="section-title">Skills</h2>
+              <p class="section-subtitle">Grouped skill chips rendered from data.</p>
             </header>
 
             <div class="skills-grid" id="skillsGrid"></div>
           </div>
         </section>
 
-        <!-- PROJECTS -->
-        <section class="section" id="projects" data-section>
-          <div class="container">
-            <header class="section-header reveal">
-              <h2 class="section-title" data-bind="projects.title">Projects</h2>
-              <p class="section-subtitle" data-bind="projects.subtitle">
-                Filter by category and open a project for details.
-              </p>
-            </header>
-
-            <div class="projects-toolbar reveal" role="region" aria-label="Project filters">
-              <div class="filter-group" role="tablist" aria-label="Project category filters" id="projectFilters"></div>
-
-              <div class="toolbar-right">
-                <label class="sr-only" for="projectSearch">Search projects</label>
-                <input
-                  class="input"
-                  type="search"
-                  id="projectSearch"
-                  placeholder="Search projects…"
-                  autocomplete="off"
-                />
-              </div>
-            </div>
-
-            <div class="projects-grid" id="projectsGrid" aria-live="polite"></div>
-          </div>
-        </section>
-
         <!-- EXPERIENCE -->
-        <section class="section" id="experience" data-section>
+        <section class="section" id="experience" aria-label="Experience">
           <div class="container">
             <header class="section-header reveal">
-              <h2 class="section-title" data-bind="experience.title">Experience</h2>
-              <p class="section-subtitle" data-bind="experience.subtitle">A simple timeline rendered from data.</p>
+              <h2 class="section-title">Experience</h2>
+              <p class="section-subtitle">A simple timeline rendered from data.</p>
             </header>
 
             <ol class="timeline" id="experienceTimeline"></ol>
-          </div>
-        </section>
-
-        <!-- TESTIMONIALS -->
-        <section class="section" id="testimonials" data-section>
-          <div class="container">
-            <header class="section-header reveal">
-              <h2 class="section-title" data-bind="testimonials.title">Testimonials</h2>
-              <p class="section-subtitle" data-bind="testimonials.subtitle">
-                Optional section (included) – toggle by editing data.
-              </p>
-            </header>
-
-            <div class="testimonials-grid" id="testimonialsGrid"></div>
-          </div>
-        </section>
-
-        <!-- CONTACT -->
-        <section class="section" id="contact" data-section>
-          <div class="container">
-            <header class="section-header reveal">
-              <h2 class="section-title" data-bind="contact.title">Contact</h2>
-              <p class="section-subtitle" data-bind="contact.subtitle">
-                This form is UI-only. Add a backend later if needed.
-              </p>
-            </header>
-
-            <div class="contact-grid">
-              <div class="card reveal">
-                <h3 class="card-title">Send a message</h3>
-
-                <form class="form" id="contactForm" novalidate>
-                  <div class="field">
-                    <label class="label" for="name">Name</label>
-                    <input class="input" id="name" name="name" type="text" autocomplete="name" required />
-                    <p class="hint" id="nameHint">Please enter your name.</p>
-                  </div>
-
-                  <div class="field">
-                    <label class="label" for="email">Email</label>
-                    <input class="input" id="email" name="email" type="email" autocomplete="email" required />
-                    <p class="hint" id="emailHint">Use a valid email address (e.g., name@example.com).</p>
-                  </div>
-
-                  <div class="field">
-                    <label class="label" for="message">Message</label>
-                    <textarea class="textarea" id="message" name="message" rows="5" required></textarea>
-                    <p class="hint" id="messageHint">Tell me what you’re building (minimum 10 characters).</p>
-                  </div>
-
-                  <div class="form-actions">
-                    <button class="btn btn-primary" type="submit">Send</button>
-                    <p class="muted" id="formStatus" role="status" aria-live="polite"></p>
-                  </div>
-                </form>
-              </div>
-
-              <aside class="card reveal" aria-label="Contact details">
-                <h3 class="card-title">Elsewhere</h3>
-                <p class="muted" data-bind="contact.aside">
-                  Prefer email or social? Reach out via the links below.
-                </p>
-
-                <ul class="social-list" id="contactSocial"></ul>
-
-                <div class="divider" role="presentation"></div>
-
-                <p class="muted" id="contactEmailRow"></p>
-              </aside>
-            </div>
           </div>
         </section>
       </div>
@@ -275,34 +161,34 @@
     <footer class="site-footer" role="contentinfo">
       <div class="container footer-inner">
         <p class="muted" id="footerText">© <span id="year"></span> Raven. All rights reserved.</p>
-
-        <button class="btn btn-ghost back-to-top" type="button" id="backToTop">
-          Back to top
-        </button>
+        <button class="btn btn-ghost back-to-top" type="button" id="backToTop">Back to top</button>
       </div>
     </footer>
 
-    <!-- PROJECT MODAL -->
+    <!-- SHARED MODAL -->
     <div class="modal" id="projectModal" hidden>
-      <div class="modal-backdrop" data-close-modal></div>
+      <div class="modal-backdrop" data-close-modal aria-hidden="true"></div>
 
       <div
         class="modal-dialog"
+        id="projectModalDialog"
         role="dialog"
         aria-modal="true"
         aria-labelledby="modalTitle"
         aria-describedby="modalDesc"
       >
+
         <div class="modal-header">
           <h3 class="modal-title" id="modalTitle">Project title</h3>
           <button class="icon-btn" type="button" id="modalClose" aria-label="Close project details">
             <span class="icon" aria-hidden="true">✕</span>
           </button>
         </div>
+        <div class="modal-media" id="modalMedia" aria-label="Project media"></div>
 
         <div class="modal-body">
-          <p class="muted" id="modalDesc"></p>
           <div class="modal-meta" id="modalMeta"></div>
+          <p class="muted" id="modalDesc"></p>
           <div class="modal-actions" id="modalActions"></div>
           <div class="modal-details prose" id="modalDetails"></div>
         </div>
